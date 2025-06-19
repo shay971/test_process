@@ -25,7 +25,12 @@ jobs:
         shopt -s nullglob
         for file in zips/*.zip; do
           name=$(basename "$file" .zip)
-          unzip -o "$file" -d "docs/processus/$name"
+          mkdir -p "docs/processus/$name"
+          unzip -o "$file" -d "extracted"
+          # déplace le contenu intérieur dans le dossier final
+          inner=$(unzip -Z1 "$file" | head -1 | cut -d/ -f1)
+          mv "extracted/$inner/"* "docs/processus/$name/"
+          rm -rf extracted/*
         done
 
     - name: Update index.html
