@@ -1,0 +1,48 @@
+name: Extract and update summary
+
+on:                           # définit quand ce workflow doit être lancé (git push)
+  push:
+    paths:
+      - 'zips/*.zip'
+
+jobs:
+  process-zip:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
+    - name: Install unzip
+      run: sudo apt-get install unzip
+
+    - name: Extract zip files
+      run: |
+        mkdir -p extracted
+        for file in zips/*.zip; do
+          name=$(basename "$file" .zip)
+          unzip -o "$file" -d "docs/processus/$name"
+        done
+
+    - name: Update index.html
+      run: |
+        echo "Mise à jour du sommaire (docs/index.html)"
+        ls docs/processus > tmp_list.txt
+
+        echo '<ol class="list-decimal list-inside text-gray-800 space-y-8 px-4">' > docs/index.html
+
+        idx=1
+        for dir in $(cat tmp_list.txt); do
+          echo "<li><a href='./processus/$dir/index.html' target='_blank'>Processus V$idx</a></li>" >> docs/index.html
+          idx=$((idx + 1))
+        done
+
+        echo '</ol>' >> docs/index.html
+
+    - name: Commit & Push
+      run: |
+        git config user.name "github-actions"                         
+        git config user.email "github-actions@github.com"
+        git add docs/
+        git commit -m " Ajout automatique de nouveaux processus "
+        git push
