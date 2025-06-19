@@ -3,7 +3,7 @@ name: Extract and update summary
 on:                           # définit quand ce workflow doit être lancé (git push)
   push:
     paths:
-      - 'zips/*.zip'
+      - 'zone_zip/*.zip'
 
 jobs:
   process-zip:
