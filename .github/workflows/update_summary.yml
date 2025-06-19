@@ -5,6 +5,9 @@ on:                           # définit quand ce workflow doit être lancé (gi
     paths:
       - 'zips/*.zip'
 
+permissions:
+  contents: write
+
 jobs:
   process-zip:
     runs-on: ubuntu-latest
@@ -19,6 +22,7 @@ jobs:
     - name: Extract zip files
       run: |
         mkdir -p extracted
+        shopt -s nullglob
         for file in zips/*.zip; do
           name=$(basename "$file" .zip)
           unzip -o "$file" -d "docs/processus/$name"
@@ -41,8 +45,9 @@ jobs:
 
     - name: Commit & Push
       run: |
-        git config user.name "github-actions"                         
+        git config user.name "github-actions"
         git config user.email "github-actions@github.com"
+        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
         git add docs/
-        git commit -m " Ajout automatique de nouveaux processus "
-        git push
+        git commit -m "Ajout automatique de nouveaux processus" || echo "Rien à valider"
+        git push origin main
