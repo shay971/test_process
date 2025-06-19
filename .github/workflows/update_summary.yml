@@ -31,17 +31,48 @@ jobs:
     - name: Update index.html
       run: |
         echo "Mise à jour du sommaire (docs/index.html)"
-        ls docs/processus > tmp_list.txt
+        cat <<'EOF' > docs/index.html
+        <!DOCTYPE html>
+        <html lang="fr">
+        <head>
+          <meta charset="UTF-8" />
+          <title>Sommaire des processus</title>
+          <script src="https://cdn.tailwindcss.com"></script>
+          <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+          <style>
+            .font-handwriting {
+              font-family: 'Pacifico', cursive;
+            }
+          </style>
+        </head>
+        <body class="flex items-center justify-center min-h-screen bg-white">
+          <div class="bg-blue-50 border-4 border-blue-300 rounded-xl p-5 w-[75vw] h-[75vh] shadow-lg mx-auto my-auto">
+            <h2 class="text-4xl font-handwriting text-center text-blue-700 mb-10">Sommaire</h2>
+            <ol class="list-decimal list-inside text-gray-800 flex-grow overflow-auto space-y-8 px-4">
+        EOF
 
-        echo '<ol class="list-decimal list-inside text-gray-800 space-y-8 px-4">' > docs/index.html
+                idx=1
+                for dir in docs/processus/*; do
+                  [ -d "$dir" ] || continue
+                  name=$(basename "$dir")
+                  echo "      <li class=\"flex items-center space-x-4 group cursor-pointer\">" >> docs/index.html
+                  printf "        <span class=\"text-blue-400 font-extrabold text-3xl min-w-[60px] text-center group-hover:text-blue-600 transition-colors\">→%02d</span>\n" $idx >> docs/index.html
+                  echo "        <a href=\"./processus/$name/index.html\" target=\"_blank\" class=\"text-blue-900 text-2xl font-semibold hover:underline transition\">$name</a>" >> docs/index.html
+                  echo "      </li>" >> docs/index.html
+                  idx=$((idx + 1))
+                done
 
-        idx=1
-        for dir in $(cat tmp_list.txt); do
-          echo "<li><a href='./processus/$dir/index.html' target='_blank'>Processus V$idx</a></li>" >> docs/index.html
-          idx=$((idx + 1))
-        done
-
-        echo '</ol>' >> docs/index.html
+                cat <<'EOF' >> docs/index.html
+            </ol>
+            <div class="mt-6 flex justify-center">
+              <a href="https://github.com/shay971/test_process/upload/main/zips" target="_blank" class="px-6 py-2 bg-gradient-to-r from-cyan-400 to-blue-500 text-white rounded-lg shadow hover:from-cyan-500 hover:to-blue-600 transition">
+                ➕ Ajouter un processus
+              </a>
+            </div>
+          </div>
+        </body>
+        </html>
+        EOF
 
     - name: Commit & Push
       run: |
