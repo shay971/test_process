@@ -87,3 +87,5 @@ jobs:
         git add docs/
         git commit -m "Ajout automatique de nouveaux processus" || echo "Rien à valider"
         git push origin main
+
+#tous les emails finissent par sogeclair.com
