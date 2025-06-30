@@ -25,7 +25,7 @@ jobs:
         shopt -s nullglob
         for file in zips/*.zip; do
           name=$(basename "$file" .zip)
-          mkdir -p "docs/processus/$name"
+          mkdir -p "docs/processus/$name"             #ajouter écrasement fichier
           unzip -o "$file" -d "extracted"
           # déplace le contenu intérieur dans le dossier final
           inner=$(unzip -Z1 "$file" | head -1 | cut -d/ -f1)
